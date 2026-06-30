@@ -45,7 +45,7 @@ export default function ForgotPassword() {
     <div className="flex min-h-screen flex-col bg-black">
       <div className="flex flex-1 items-center justify-center px-4 py-12">
         <div className="w-full max-w-md rounded-2xl border border-zinc-800 bg-zinc-950/70 p-8 shadow-xl">
-          <Link to="/login" className="text-sm font-semibold text-emerald-400 hover:underline">
+          <Link to="/login" className="text-sm font-semibold text-brand-coral hover:underline">
             ← Đăng nhập
           </Link>
           <h1 className="mt-6 font-display text-2xl font-bold text-white">Quên mật khẩu</h1>
@@ -63,13 +63,13 @@ export default function ForgotPassword() {
                 placeholder="ten@example.com"
                 value={email}
                 onChange={(ev) => setEmail(ev.target.value)}
-                className="w-full rounded-xl border border-zinc-700 bg-black px-4 py-3 text-zinc-100 outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-500/40"
+                className="w-full rounded-xl border border-white/10 bg-black px-4 py-3 text-zinc-100 outline-none focus:border-brand-coral focus:ring-2 focus:ring-brand-coral/40"
               />
             </div>
             {msg ? (
-              <div className="space-y-2 rounded-lg border border-emerald-500/40 bg-emerald-950/50 px-3 py-2 text-sm text-emerald-100">
+              <div className="space-y-2 rounded-lg border border-brand-coral/40 bg-brand-coral/10 px-3 py-2 text-sm text-brand-coral">
                 <p>{msg}</p>
-                <p className="text-xs text-emerald-200/80">
+                <p className="text-xs text-brand-coral/80">
                   Không thấy mail? Kiểm tra spam và xem lại email có trùng hệ thống đăng ký. Bạn vẫn có thể bấm gửi lại.
                 </p>
               </div>
@@ -80,7 +80,7 @@ export default function ForgotPassword() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full rounded-xl bg-emerald-500 py-3 text-sm font-semibold text-black hover:bg-emerald-400 disabled:opacity-50"
+              className="w-full rounded-xl bg-brand-coral py-3 text-sm font-semibold text-white shadow-lg shadow-brand-coral/25 hover:bg-brand-accent disabled:opacity-50"
             >
               {loading ? 'Đang gửi…' : 'Gửi mật khẩu mới qua email'}
             </button>

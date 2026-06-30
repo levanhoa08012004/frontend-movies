@@ -3,6 +3,19 @@ import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom'
 import GoogleSignInButton from '../components/GoogleSignInButton.jsx'
 import { useAuth } from '../context/useAuth.js'
 
+/**
+ * Redirect đích sau login theo role:
+ * - ADMIN → bảng điều khiển admin
+ * - CARE  → dashboard chăm sóc khách hàng
+ * - USER  → trang user đã yêu cầu trước login, hoặc trang chủ
+ */
+function roleHome(u, location) {
+  if (!u) return '/'
+  if (u.role === 'ADMIN') return '/quan-tri'
+  if (u.role === 'CARE') return '/quan-tri/cham-soc'
+  return location?.state?.from?.pathname || '/'
+}
+
 export default function Login() {
   const navigate = useNavigate()
   const location = useLocation()
@@ -28,8 +41,8 @@ export default function Login() {
       }
       setGoogleBusy(true)
       try {
-        await loginWithGoogle(credential)
-        navigate('/dashboard', { replace: true })
+        const u = await loginWithGoogle(credential)
+        navigate(roleHome(u, location), { replace: true })
       } catch (err) {
         const msg =
           err.response?.data?.message ||
@@ -45,7 +58,7 @@ export default function Login() {
   )
 
   if (!initializing && user) {
-    return <Navigate to="/dashboard" replace />
+    return <Navigate to={roleHome(user, location)} replace />
   }
 
   async function onSubmit(e) {
@@ -53,8 +66,8 @@ export default function Login() {
     setError('')
     setLoading(true)
     try {
-      await login(email.trim(), password)
-      navigate('/dashboard', { replace: true })
+      const u = await login(email.trim(), password)
+      navigate(roleHome(u, location), { replace: true })
     } catch (err) {
       const msg =
         err.response?.data?.message ||
@@ -70,10 +83,10 @@ export default function Login() {
   return (
     <div className="flex min-h-screen flex-col bg-black">
       <div className="flex flex-1 items-center justify-center px-4 py-12">
-        <div className="w-full max-w-md rounded-2xl border border-zinc-800 bg-zinc-950/70 p-8 shadow-xl shadow-emerald-500/10">
+        <div className="w-full max-w-md rounded-2xl border border-white/10 bg-zinc-950/80 p-8 shadow-xl shadow-brand-coral/15 backdrop-blur">
           <Link
-            to="/dashboard"
-            className="inline-block text-2xl font-bold tracking-tight text-emerald-400"
+            to="/"
+            className="font-display inline-block text-2xl font-bold tracking-tight text-brand-coral"
           >
             VieStream
           </Link>
@@ -104,13 +117,13 @@ export default function Login() {
                 value={email}
                 onChange={(ev) => setEmail(ev.target.value)}
                 placeholder="your@mail.com"
-                className="w-full rounded-xl border border-zinc-700 bg-black px-4 py-3 text-zinc-100 outline-none ring-emerald-500/0 transition focus:border-emerald-600 focus:ring-2 focus:ring-emerald-500/40"
+                className="w-full rounded-xl border border-white/10 bg-black px-4 py-3 text-zinc-100 outline-none transition focus:border-brand-coral focus:ring-2 focus:ring-brand-coral/40"
               />
             </div>
             <div>
               <div className="mb-2 flex items-center justify-between gap-2">
                 <label className="text-sm font-medium text-zinc-400">Mật khẩu</label>
-                <Link to="/quen-mat-khau" className="text-xs font-semibold text-emerald-500/90 hover:underline">
+                <Link to="/quen-mat-khau" className="text-xs font-semibold text-brand-coral hover:underline">
                   Quên mật khẩu?
                 </Link>
               </div>
@@ -121,12 +134,12 @@ export default function Login() {
                 value={password}
                 onChange={(ev) => setPassword(ev.target.value)}
                 placeholder="••••••••"
-                className="w-full rounded-xl border border-zinc-700 bg-black px-4 py-3 text-zinc-100 outline-none ring-emerald-500/0 transition focus:border-emerald-600 focus:ring-2 focus:ring-emerald-500/40"
+                className="w-full rounded-xl border border-white/10 bg-black px-4 py-3 text-zinc-100 outline-none transition focus:border-brand-coral focus:ring-2 focus:ring-brand-coral/40"
               />
             </div>
 
             {regOk ? (
-              <p className="rounded-lg border border-emerald-500/40 bg-emerald-950/50 px-3 py-2 text-sm text-emerald-100">
+              <p className="rounded-lg border border-brand-coral/40 bg-brand-coral/10 px-3 py-2 text-sm text-brand-coral">
                 Đăng ký thành công — đăng nhập để tiếp tục.
               </p>
             ) : null}
@@ -143,7 +156,7 @@ export default function Login() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full rounded-xl bg-emerald-500 py-3 text-sm font-semibold text-black transition hover:bg-emerald-400 disabled:cursor-not-allowed disabled:bg-zinc-600"
+              className="w-full rounded-xl bg-brand-coral py-3 text-sm font-semibold text-white shadow-lg shadow-brand-coral/25 transition hover:bg-brand-accent disabled:cursor-not-allowed disabled:bg-zinc-600"
             >
               {loading ? 'Đang đăng nhập…' : 'Đăng nhập'}
             </button>
@@ -151,7 +164,7 @@ export default function Login() {
 
           <p className="mt-6 text-center text-sm text-zinc-500">
             Chưa có tài khoản?{' '}
-            <Link to="/register" className="font-medium text-emerald-400 hover:underline">
+            <Link to="/register" className="font-medium text-brand-coral hover:underline">
               Tạo tài khoản miễn phí
             </Link>
           </p>

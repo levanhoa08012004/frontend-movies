@@ -85,9 +85,15 @@ export default function Explore() {
   const inputCls = 'vie-input-dark vie-autofill-fix'
 
   return (
-    <div className="mx-auto min-h-screen max-w-[1600px] px-5 py-10 sm:px-8 lg:px-12">
+    <div className="relative min-h-screen bg-gradient-to-b from-black via-neutral-950 to-zinc-950">
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 top-0 h-64 bg-[radial-gradient(ellipse_80%_60%_at_50%_-10%,rgba(244,63,94,0.14),transparent)]"
+      />
+      <div className="relative mx-auto max-w-[1600px] px-5 py-10 sm:px-8 lg:px-12">
       <header className="mb-10">
-        <h1 className="font-display text-4xl font-bold tracking-tight text-white md:text-5xl">Khám phá</h1>
+        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-brand-coral">Thư viện phim</p>
+        <h1 className="font-display mt-2 text-4xl font-bold tracking-tight text-white md:text-5xl">Khám phá</h1>
       </header>
 
       <form
@@ -215,7 +221,7 @@ export default function Explore() {
           <button
             type="button"
             disabled={page <= 0}
-            className="min-h-[48px] min-w-[120px] rounded-xl border border-white/15 px-6 text-base font-semibold text-zinc-200 transition hover:bg-white/5 disabled:opacity-35"
+            className="min-h-[48px] min-w-[120px] rounded-xl border border-white/15 px-6 text-base font-semibold text-zinc-200 transition hover:border-brand-coral/50 hover:bg-white/5 disabled:opacity-35"
             onClick={() => setPage((p) => Math.max(0, p - 1))}
           >
             ← Trước
@@ -226,13 +232,14 @@ export default function Explore() {
           <button
             type="button"
             disabled={page >= pageData.totalPages - 1}
-            className="min-h-[48px] min-w-[120px] rounded-xl border border-white/15 px-6 text-base font-semibold text-zinc-200 transition hover:bg-white/5 disabled:opacity-35"
+            className="min-h-[48px] min-w-[120px] rounded-xl border border-white/15 px-6 text-base font-semibold text-zinc-200 transition hover:border-brand-coral/50 hover:bg-white/5 disabled:opacity-35"
             onClick={() => setPage((p) => p + 1)}
           >
             Sau →
           </button>
         </div>
       ) : null}
+      </div>
     </div>
   )
 }

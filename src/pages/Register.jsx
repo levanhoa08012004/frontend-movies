@@ -100,14 +100,14 @@ export default function Register() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full rounded-xl bg-emerald-500 py-3 text-sm font-semibold text-black disabled:opacity-50"
+            className="w-full rounded-xl bg-brand-coral py-3 text-sm font-semibold text-white shadow-lg shadow-brand-coral/25 hover:bg-brand-accent disabled:opacity-50"
           >
             {loading ? '…' : 'Tạo tài khoản'}
           </button>
         </form>
         <p className="mt-6 text-center text-sm text-zinc-500">
           Đã có tài khoản?{' '}
-          <Link to="/login" className="text-emerald-400">
+          <Link to="/login" className="text-brand-coral hover:underline">
             Đăng nhập
           </Link>
         </p>

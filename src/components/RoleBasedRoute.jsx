@@ -21,7 +21,7 @@ export default function RoleBasedRoute({ allowedRoles }) {
         </p>
         <Link
           to="/dashboard"
-          className="mt-8 inline-flex rounded-xl bg-emerald-600 px-6 py-2.5 text-sm font-semibold text-black"
+          className="mt-8 inline-flex rounded-xl bg-brand-coral px-6 py-2.5 text-sm font-semibold text-white hover:bg-brand-accent"
         >
           Về trang chủ
         </Link>

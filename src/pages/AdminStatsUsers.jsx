@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import AdminPageShell from '../components/AdminPageShell.jsx'
 import AdminTopMoviesBarChart from '../components/AdminTopMoviesBarChart.jsx'
+import AdminUserGrowthLineChart from '../components/AdminUserGrowthLineChart.jsx'
 import * as adminApi from '../services/adminApi'
 
 function toInstantParam(raw) {
@@ -63,6 +64,7 @@ export default function AdminStatsUsers() {
             <Metric label="Active trong kỳ" value={data.activeUsersInRange} />
             <Metric label="% user từng trả VIP" value={data.freeToPayingUserPercent} suffix="%" />
           </div>
+          <AdminUserGrowthLineChart series={data.userGrowthSeries} />
           <AdminTopMoviesBarChart rows={data.topWatchedMovies} title="Top phim theo watch (behavior) trong kỳ" />
         </div>
       ) : null}

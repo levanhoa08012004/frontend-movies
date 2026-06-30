@@ -1,3 +1,5 @@
+@import './styles/cosmetics.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -8,6 +10,37 @@
   }
   body {
     @apply m-0 min-h-screen bg-neutral-950 text-zinc-100 font-sans;
+  }
+
+  /* Vieon-style global scrollbar — siêu mảnh + mờ, chỉ hiện rõ khi hover */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: rgb(63 63 70 / 0.18) transparent;
+  }
+  *::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  *::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  *::-webkit-scrollbar-thumb {
+    background-color: rgb(63 63 70 / 0.18);
+    border-radius: 9999px;
+    border: 1px solid transparent;
+    background-clip: padding-box;
+    transition: background-color 0.25s ease;
+  }
+  *::-webkit-scrollbar-thumb:hover {
+    background-color: rgb(244 63 94 / 0.45);
+    background-clip: padding-box;
+  }
+  *::-webkit-scrollbar-thumb:active {
+    background-color: rgb(244 63 94 / 0.7);
+    background-clip: padding-box;
+  }
+  *::-webkit-scrollbar-corner {
+    background: transparent;
   }
 }
 
@@ -41,6 +74,39 @@
 }
 
 @layer utilities {
+  /* Thanh cuộn mảnh cho horizontal rails / strip — chỉ hiện rõ khi hover container */
+  .vie-scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: rgb(63 63 70 / 0.3) transparent;
+  }
+  .vie-scrollbar-thin::-webkit-scrollbar {
+    height: 6px;
+    width: 6px;
+  }
+  .vie-scrollbar-thin::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .vie-scrollbar-thin::-webkit-scrollbar-thumb {
+    background-color: rgb(63 63 70 / 0.35);
+    border-radius: 9999px;
+    transition: background-color 0.2s ease;
+  }
+  .vie-scrollbar-thin:hover::-webkit-scrollbar-thumb {
+    background-color: rgb(244 63 94 / 0.55);
+  }
+  .vie-scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    background-color: rgb(244 63 94 / 0.85);
+  }
+
+  /* Ẩn hoàn toàn scrollbar (vẫn scroll được) — cho carousel có nút mũi tên riêng */
+  .vie-scrollbar-hide {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .vie-scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
   input.vie-autofill-fix:is(:-webkit-autofill, :autofill),
   textarea.vie-autofill-fix:is(:-webkit-autofill, :autofill),
   select.vie-autofill-fix:is(:-webkit-autofill, :autofill) {

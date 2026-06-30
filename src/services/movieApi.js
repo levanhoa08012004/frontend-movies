@@ -11,8 +11,17 @@ export async function searchMovies(q, params) {
   return unwrap(res)
 }
 
-export async function getMovie(id, includeEpisodes = false) {
-  const res = await api.get(`/api/movies/${id}`, { params: { includeEpisodes } })
+export async function getMovie(id, includeEpisodes = false, hints = {}) {
+  // via='catalog' báo Spring tra waterfall: slug → catalog_id → tmdb+kind. Hints
+  // (slug, tmdb, kind) tăng tỉ lệ resolve khi catalog_id không match (TV) hoặc
+  // phim ingest dưới slug khác. Mặc định undefined → giữ behavior cũ (PK).
+  const { via, slug, tmdb, kind } = hints
+  const params = { includeEpisodes }
+  if (via) params.via = via
+  if (slug) params.slug = slug
+  if (tmdb) params.tmdb = tmdb
+  if (kind) params.kind = kind
+  const res = await api.get(`/api/movies/${id}`, { params })
   return unwrap(res)
 }
 
@@ -89,4 +98,9 @@ export async function listComments(movieId, params) {
 
 export async function deleteComment(commentId) {
   await api.delete(`/api/movies/comments/${commentId}`)
+}
+
+export async function updateComment(commentId, content) {
+  const res = await api.patch(`/api/movies/comments/${commentId}`, { content })
+  return unwrap(res)
 }

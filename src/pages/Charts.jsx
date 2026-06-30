@@ -58,10 +58,7 @@ export default function Charts() {
       <div className="pointer-events-none absolute inset-x-0 top-0 h-64 bg-[radial-gradient(ellipse_70%_50%_at_50%_-20%,rgba(244,63,94,0.1),transparent)]" />
       <div className="relative">
         <h1 className="font-display text-4xl font-bold tracking-tight text-white md:text-5xl">Bảng xếp hạng lượt xem</h1>
-        <p className="mt-4 max-w-2xl text-[15px] leading-relaxed text-zinc-500">
-          Xếp hạng theo số lần ghi nhận <span className="text-brand-coral">watch</span> trong bảng hoạt động người dùng (sau khi đăng nhập), theo ngày / tuần (từ thứ Hai) / tháng lịch — múi{' '}
-          <span className="text-zinc-400">Asia/Ho_Chi_Minh</span>. Có thể bấm &quot;Làm mới ngay&quot; hoặc quay lại tab để tải lại.
-        </p>
+
         <div className="mt-8 flex flex-wrap gap-2">
           {TABS.map((t) => (
             <button

@@ -1,12 +1,17 @@
 import { useAuth } from '../context/useAuth.js'
+import { useMyCosmetics } from '../context/useUserCosmetics.js'
 import NotificationBell from './NotificationBell.jsx'
 
 export default function Navbar({ onOpenMenu }) {
   const { user, logout } = useAuth()
+  const { equipped } = useMyCosmetics()
 
   const display = user?.name?.trim()
     ? user.name
     : user?.username || user?.email || 'Người dùng'
+
+  const nameEffect = equipped?.name_effect?.cssClass || ''
+  const nameBadge = equipped?.name_badge?.badgeHtml || ''
 
   const roleVi = user?.role === 'ADMIN' ? 'Quản trị' : 'Thành viên'
 
@@ -28,11 +33,13 @@ export default function Navbar({ onOpenMenu }) {
       <NotificationBell />
 
       <div className="hidden flex-col items-end sm:flex">
-        <span className="max-w-[14rem] truncate text-sm font-medium text-zinc-200">{display}</span>
+        <span className={`max-w-[14rem] truncate text-sm font-medium text-zinc-200 ${nameEffect}`}>
+          {display} {nameBadge && <span className="ml-1">{nameBadge}</span>}
+        </span>
         <span className="text-[11px] text-zinc-500">{roleVi}</span>
       </div>
 
-      <span className="rounded-full bg-emerald-500/15 px-3 py-1 text-[11px] font-semibold text-emerald-300 ring-1 ring-emerald-500/30 sm:hidden">
+      <span className="rounded-full bg-brand-coral/15 px-3 py-1 text-[11px] font-semibold text-brand-coral ring-1 ring-brand-coral/30 sm:hidden">
         {roleVi}
       </span>
 

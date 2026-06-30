@@ -2,10 +2,24 @@ import { useCallback, useEffect, useState } from 'react'
 import AdminPageShell from '../components/AdminPageShell.jsx'
 import { useAuth } from '../context/useAuth.js'
 import * as adminApi from '../services/adminApi'
+import { assetUrl } from '../utils/assetUrl.js'
 
 const ADMIN_USER_PAGE_SIZE = 12
-const ROLE_OPTS = ['USER', 'ADMIN']
+const ROLE_OPTS = ['USER', 'CARE', 'ADMIN']
 const VIP_OPTS = ['NONE', 'VIP', 'VIPPRO', 'PRIME']
+const GENDER_LABEL = { MALE: 'Nam', FEMALE: 'Nữ', OTHER: 'Khác', UNSPECIFIED: 'Không tiết lộ' }
+
+function roleBadgeCls(role) {
+  if (role === 'ADMIN') return 'bg-brand-coral/20 text-brand-coral ring-1 ring-brand-coral/30'
+  if (role === 'CARE') return 'bg-sky-500/20 text-sky-300 ring-1 ring-sky-500/40'
+  return 'bg-zinc-800 text-zinc-200 ring-1 ring-zinc-600'
+}
+
+function fmtDate(s) {
+  if (!s) return '—'
+  try { return new Date(s).toLocaleString('vi-VN', { dateStyle: 'short', timeStyle: 'short' }) }
+  catch { return s }
+}
 
 const field = 'vie-input-dark vie-autofill-fix vie-datetime-dark min-h-[48px]'
 
@@ -36,6 +50,7 @@ export default function Admin() {
   const [toast, setToast] = useState('')
   const [createOpen, setCreateOpen] = useState(false)
   const [editRow, setEditRow] = useState(null)
+  const [viewRow, setViewRow] = useState(null)
 
   const [cEmail, setCEmail] = useState('')
   const [cPass, setCPass] = useState('')
@@ -127,7 +142,7 @@ export default function Admin() {
         email: cEmail.trim(),
         password: cPass,
         name: cName.trim() || undefined,
-        role: cRole === 'ADMIN' ? 'ADMIN' : 'USER',
+        role: ROLE_OPTS.includes(cRole) ? cRole : 'USER',
       })
       setToast('Đã tạo người dùng.')
       setCreateOpen(false)
@@ -216,23 +231,25 @@ export default function Admin() {
 
       <div className="overflow-hidden rounded-2xl border border-white/[0.08] bg-brand-panel shadow-2xl shadow-black/50">
         <div className="overflow-x-auto">
-          <table className="min-w-[1100px] w-full border-collapse">
+          <table className="min-w-[1280px] w-full border-collapse">
             <thead className="bg-zinc-900/95">
               <tr>
                 <th className={th}>ID</th>
-                <th className={th}>Email</th>
-                <th className={th}>Tên</th>
+                <th className={th}>Người dùng</th>
+                <th className={`${th} hidden md:table-cell`}>SĐT</th>
                 <th className={th}>Vai trò</th>
-                <th className={th}>Kích hoạt</th>
                 <th className={`${th} hidden lg:table-cell`}>VIP</th>
-                <th className={`${th} hidden md:table-cell`}>Trạng thái ẩn</th>
+                <th className={`${th} hidden lg:table-cell`}>Hết hạn VIP</th>
+                <th className={`${th} hidden xl:table-cell`}>Giới tính</th>
+                <th className={th}>Kích hoạt</th>
+                <th className={`${th} hidden md:table-cell`}>Trạng thái</th>
                 <th className={th}>Thao tác</th>
               </tr>
             </thead>
             <tbody>
               {!loading && rows.length === 0 && !error ? (
                 <tr>
-                  <td colSpan={8} className={`${td} py-14 text-center text-zinc-500`}>
+                  <td colSpan={10} className={`${td} py-14 text-center text-zinc-500`}>
                     Không có bản ghi.
                   </td>
                 </tr>
@@ -240,32 +257,69 @@ export default function Admin() {
               {rows.map((r) => (
                 <tr key={r.id} className="transition hover:bg-brand-coral/[0.04]">
                   <td className={`${td} text-zinc-500`}>{r.id}</td>
-                  <td className={`${td} font-medium text-white`}>{r.email}</td>
-                  <td className={`${td} text-zinc-400`}>{r.name ?? '—'}</td>
                   <td className={td}>
-                    <span
-                      className={`inline-flex rounded-full px-4 py-1.5 text-sm font-bold ${
-                        r.role === 'ADMIN'
-                          ? 'bg-brand-coral/20 text-brand-coral ring-1 ring-brand-coral/30'
-                          : 'bg-zinc-800 text-zinc-200 ring-1 ring-zinc-600'
-                      }`}
-                    >
+                    <div className="flex items-center gap-3">
+                      {r.avatar ? (
+                        <img
+                          src={assetUrl(r.avatar) || r.avatar}
+                          alt=""
+                          className="h-10 w-10 shrink-0 rounded-full object-cover"
+                          onError={(e) => { e.currentTarget.style.display = 'none' }}
+                        />
+                      ) : (
+                        <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-gradient-to-br from-brand-coral to-amber-400 text-sm font-bold text-white">
+                          {(r.name || r.email || '?').slice(0, 1).toUpperCase()}
+                        </span>
+                      )}
+                      <div className="min-w-0 leading-tight">
+                        <p className="truncate text-sm font-semibold text-white">{r.name || '—'}</p>
+                        <p className="truncate text-xs text-zinc-500">{r.email}</p>
+                      </div>
+                    </div>
+                  </td>
+                  <td className={`${td} hidden font-mono text-sm text-zinc-400 md:table-cell`}>{r.phone || '—'}</td>
+                  <td className={td}>
+                    <span className={`inline-flex rounded-full px-3 py-1 text-xs font-bold ${roleBadgeCls(r.role)}`}>
                       {r.role || 'USER'}
                     </span>
                   </td>
-                  <td className={`${td} text-zinc-400`}>{r.isActive === false ? 'Không' : 'Có'}</td>
-                  <td className={`${td} hidden text-zinc-500 lg:table-cell`}>{r.vipTier ?? '—'}</td>
+                  <td className={`${td} hidden text-zinc-300 lg:table-cell`}>
+                    <span className={r.vipTier && r.vipTier !== 'NONE' ? 'font-semibold text-amber-300' : 'text-zinc-500'}>
+                      {r.vipTier || 'NONE'}
+                    </span>
+                  </td>
+                  <td className={`${td} hidden text-xs text-zinc-400 lg:table-cell`}>{fmtDate(r.vipExpiresAt)}</td>
+                  <td className={`${td} hidden text-xs text-zinc-400 xl:table-cell`}>{GENDER_LABEL[r.gender] || '—'}</td>
+                  <td className={td}>
+                    {r.isActive === false ? (
+                      <span className="inline-flex rounded-full bg-amber-500/15 px-2 py-0.5 text-xs font-semibold text-amber-300">Khoá</span>
+                    ) : (
+                      <span className="inline-flex rounded-full bg-emerald-500/15 px-2 py-0.5 text-xs font-semibold text-emerald-300">Đang dùng</span>
+                    )}
+                  </td>
                   <td className={`${td} hidden md:table-cell`}>
                     {r.deleted ? (
                       <span className="inline-flex rounded-full bg-red-950/70 px-3 py-1 text-xs font-semibold text-red-100 ring-1 ring-red-500/35">
                         Đã ẩn
                       </span>
                     ) : (
-                      <span className="text-zinc-500">Đang dùng</span>
+                      <span className="text-zinc-500">—</span>
                     )}
                   </td>
                   <td className={td}>
                     <div className="flex flex-wrap items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setViewRow(r)}
+                        title="Xem chi tiết"
+                        aria-label="Xem chi tiết"
+                        className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-white/15 text-zinc-300 transition hover:border-brand-coral/40 hover:text-white"
+                      >
+                        <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth={2}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1 1 0 010-.644C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178a1 1 0 010 .644C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/>
+                          <circle cx="12" cy="12" r="3"/>
+                        </svg>
+                      </button>
                       <button
                         type="button"
                         onClick={() => openEdit(r)}
@@ -362,6 +416,66 @@ export default function Admin() {
         </Modal>
       ) : null}
 
+      {viewRow ? (
+        <Modal title={`Chi tiết tài khoản #${viewRow.id}`} onClose={() => setViewRow(null)}>
+          <div className="space-y-5">
+            <div className="flex items-center gap-4">
+              {viewRow.avatar ? (
+                <img
+                  src={assetUrl(viewRow.avatar) || viewRow.avatar}
+                  alt=""
+                  className="h-16 w-16 rounded-full object-cover"
+                  onError={(e) => { e.currentTarget.style.display = 'none' }}
+                />
+              ) : (
+                <span className="grid h-16 w-16 place-items-center rounded-full bg-gradient-to-br from-brand-coral to-amber-400 text-xl font-bold text-white">
+                  {(viewRow.name || viewRow.email || '?').slice(0, 1).toUpperCase()}
+                </span>
+              )}
+              <div className="min-w-0">
+                <p className="truncate text-lg font-bold text-white">{viewRow.name || '—'}</p>
+                <p className="truncate text-sm text-zinc-400">{viewRow.email}</p>
+                <span className={`mt-1 inline-flex rounded-full px-2 py-0.5 text-[11px] font-bold ${roleBadgeCls(viewRow.role)}`}>
+                  {viewRow.role || 'USER'}
+                </span>
+              </div>
+            </div>
+
+            <dl className="grid grid-cols-2 gap-x-4 gap-y-3 text-sm">
+              <Field2 label="SĐT" value={viewRow.phone} mono />
+              <Field2 label="Ngày sinh" value={viewRow.dob ? new Date(viewRow.dob).toLocaleDateString('vi-VN') : null} />
+              <Field2 label="Giới tính" value={GENDER_LABEL[viewRow.gender]} />
+              <Field2 label="Kích hoạt" value={viewRow.isActive === false ? 'Khoá' : 'Đang dùng'} />
+              <Field2 label="Gói VIP" value={viewRow.vipTier || 'NONE'} />
+              <Field2 label="Hết hạn VIP" value={fmtDate(viewRow.vipExpiresAt)} />
+              <Field2 label="Xoá mềm" value={viewRow.deleted ? 'Có (đã ẩn)' : 'Không'} />
+              <Field2 label="ID" value={viewRow.id} mono />
+              <div className="col-span-2">
+                <dt className="mb-1 text-xs font-bold uppercase tracking-wider text-zinc-500">Địa chỉ</dt>
+                <dd className="text-zinc-200">{viewRow.address || '—'}</dd>
+              </div>
+            </dl>
+
+            <div className="flex justify-end gap-2 border-t border-white/[0.06] pt-4">
+              <button
+                type="button"
+                onClick={() => setViewRow(null)}
+                className="rounded-xl border border-white/15 px-4 py-2 text-sm font-semibold text-zinc-200 hover:bg-white/5"
+              >
+                Đóng
+              </button>
+              <button
+                type="button"
+                onClick={() => { const r = viewRow; setViewRow(null); openEdit(r) }}
+                className="rounded-xl bg-brand-coral px-4 py-2 text-sm font-bold text-white hover:bg-rose-500"
+              >
+                Sửa
+              </button>
+            </div>
+          </div>
+        </Modal>
+      ) : null}
+
       {editRow ? (
         <Modal title={`Sửa #${editRow.id}`} onClose={() => !busy && setEditRow(null)}>
           <form onSubmit={submitEdit} className="space-y-4">
@@ -422,5 +536,16 @@ export default function Admin() {
         </Modal>
       ) : null}
     </AdminPageShell>
+  )
+}
+
+function Field2({ label, value, mono }) {
+  return (
+    <div>
+      <dt className="mb-0.5 text-[10px] font-bold uppercase tracking-wider text-zinc-500">{label}</dt>
+      <dd className={`text-zinc-200 ${mono ? 'font-mono text-sm' : ''}`}>
+        {value === null || value === undefined || value === '' ? <span className="text-zinc-600">—</span> : value}
+      </dd>
+    </div>
   )
 }

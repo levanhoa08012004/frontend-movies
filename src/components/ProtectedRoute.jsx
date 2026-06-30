@@ -10,7 +10,7 @@ export default function ProtectedRoute() {
 
   if (initializing) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-black text-emerald-400">
+      <div className="flex min-h-screen items-center justify-center bg-black text-brand-coral">
         Đang tải phiên đăng nhập…
       </div>
     )

@@ -19,80 +19,90 @@ function NavItem({ to, end, children, onNavigate }) {
   )
 }
 
-export default function AppSidebar({ mobileOpen, onClose }) {
+export default function AppSidebar({ mobileOpen, onClose, adminMode = false }) {
   const { user } = useAuth()
 
   function handleNav() {
     onClose?.()
   }
 
+  // adminMode=true → AdminLayout chỉ render block quản lý, không render bất cứ
+  // mục user-facing nào (Trang chủ / Khám phá / Watchlist / VIP / Profile).
+  const showUserNav = !adminMode
+
   const panel = (
     <aside className="flex h-full w-60 flex-shrink-0 flex-col border-r border-white/10 bg-zinc-950/98 backdrop-blur-xl lg:bg-zinc-950/90">
       <div className="border-b border-white/10 px-5 py-5">
         <Link
-          to="/dashboard"
+          to={adminMode ? '/quan-tri' : '/dashboard'}
           className="font-display text-xl font-bold tracking-tight text-emerald-400"
           onClick={handleNav}
         >
-          VieStream
+          VieStream{adminMode ? ' Admin' : ''}
         </Link>
-        <p className="mt-1.5 text-xs leading-relaxed text-zinc-600">Xem phim mọi lúc, mọi nơi.</p>
+        <p className="mt-1.5 text-xs leading-relaxed text-zinc-600">
+          {adminMode ? 'Khu vực quản trị viên.' : 'Xem phim mọi lúc, mọi nơi.'}
+        </p>
       </div>
       <nav className="flex-1 space-y-8 overflow-y-auto px-3 py-5">
-        <div>
-          <p className="mb-2 px-2 text-[10px] font-bold uppercase tracking-[0.15em] text-zinc-600">
-            Khám phá
-          </p>
-          <div className="space-y-0.5">
-            <NavItem to="/dashboard" end onNavigate={handleNav}>
-              Trang chủ
-            </NavItem>
-            <NavItem to="/explore" onNavigate={handleNav}>
-              Lọc &amp; tìm theo thể loại
-            </NavItem>
-            <NavItem to="/search" onNavigate={handleNav}>
-              Tìm kiếm
-            </NavItem>
-            <NavItem to="/charts" onNavigate={handleNav}>
-              Bảng xếp hạng
-            </NavItem>
-          </div>
-        </div>
-        <div>
-          <p className="mb-2 px-2 text-[10px] font-bold uppercase tracking-[0.15em] text-zinc-600">
-            Tài khoản
-          </p>
-          <div className="space-y-0.5">
-            <NavItem to="/watchlist" onNavigate={handleNav}>
-              Danh sách xem sau
-            </NavItem>
-            <NavItem to="/history" onNavigate={handleNav}>
-              Lịch sử xem
-            </NavItem>
-            <NavItem to="/devices" onNavigate={handleNav}>
-              Thiết bị đăng nhập
-            </NavItem>
-            <NavItem to="/notifications" onNavigate={handleNav}>
-              Thông báo
-            </NavItem>
-            <NavItem to="/profile" onNavigate={handleNav}>
-              Hồ sơ của tôi
-            </NavItem>
-          </div>
-        </div>
-        <div>
-          <p className="mb-2 px-2 text-[10px] font-bold uppercase tracking-[0.15em] text-zinc-600">
-            Gợi ý &amp; gói
-          </p>
-          <div className="space-y-0.5">
-            <NavItem to="/vip" onNavigate={handleNav}>
-              Thành viên VIP
-            </NavItem>
-            <NavItem to="/" onNavigate={handleNav}>
-              Tìm phim bằng hội thoại
-            </NavItem>
-          </div>
-        </div>
+        {showUserNav && (
+          <>
+            <div>
+              <p className="mb-2 px-2 text-[10px] font-bold uppercase tracking-[0.15em] text-zinc-600">
+                Khám phá
+              </p>
+              <div className="space-y-0.5">
+                <NavItem to="/dashboard" end onNavigate={handleNav}>
+                  Trang chủ
+                </NavItem>
+                <NavItem to="/explore" onNavigate={handleNav}>
+                  Lọc &amp; tìm theo thể loại
+                </NavItem>
+                <NavItem to="/search" onNavigate={handleNav}>
+                  Tìm kiếm
+                </NavItem>
+                <NavItem to="/charts" onNavigate={handleNav}>
+                  Bảng xếp hạng
+                </NavItem>
+              </div>
+            </div>
+            <div>
+              <p className="mb-2 px-2 text-[10px] font-bold uppercase tracking-[0.15em] text-zinc-600">
+                Tài khoản
+              </p>
+              <div className="space-y-0.5">
+                <NavItem to="/watchlist" onNavigate={handleNav}>
+                  Danh sách xem sau
+                </NavItem>
+                <NavItem to="/history" onNavigate={handleNav}>
+                  Lịch sử xem
+                </NavItem>
+                <NavItem to="/devices" onNavigate={handleNav}>
+                  Thiết bị đăng nhập
+                </NavItem>
+                <NavItem to="/notifications" onNavigate={handleNav}>
+                  Thông báo
+                </NavItem>
+                <NavItem to="/profile" onNavigate={handleNav}>
+                  Hồ sơ của tôi
+                </NavItem>
+              </div>
+            </div>
+            <div>
+              <p className="mb-2 px-2 text-[10px] font-bold uppercase tracking-[0.15em] text-zinc-600">
+                Gợi ý &amp; gói
+              </p>
+              <div className="space-y-0.5">
+                <NavItem to="/vip" onNavigate={handleNav}>
+                  Thành viên VIP
+                </NavItem>
+                <NavItem to="/" onNavigate={handleNav}>
+                  Tìm phim bằng hội thoại
+                </NavItem>
+              </div>
+            </div>
+          </>
+        )}
         {user?.role === 'ADMIN' ? (
           <div>
             <p className="mb-2 px-2 text-[10px] font-bold uppercase tracking-[0.18em] text-amber-500/90">
@@ -108,20 +118,26 @@ export default function AppSidebar({ mobileOpen, onClose }) {
               <NavItem to="/quan-tri/phim" onNavigate={handleNav}>
                 Kho phim
               </NavItem>
+              <NavItem to="/quan-tri/tap" onNavigate={handleNav}>
+                Tập phim
+              </NavItem>
+              <NavItem to="/quan-tri/vip" onNavigate={handleNav}>
+                Gói VIP
+              </NavItem>
+              <NavItem to="/quan-tri/vip/dac-quyen" onNavigate={handleNav}>
+                Đặc quyền VIP
+              </NavItem>
+              <NavItem to="/quan-tri/vip/items" onNavigate={handleNav}>
+                Vật phẩm VIP
+              </NavItem>
               <NavItem to="/quan-tri/thong-ke" onNavigate={handleNav}>
                 Thống kê xem &amp; tương tác
               </NavItem>
               <NavItem to="/quan-tri/bao-cao-vip" onNavigate={handleNav}>
                 Báo cáo VIP
               </NavItem>
-              <NavItem to="/quan-tri/nhap-phim" onNavigate={handleNav}>
-                Thêm phim từ tệp
-              </NavItem>
-              <NavItem to="/quan-tri/cong-cu-hanh-vi" onNavigate={handleNav}>
-                Công cụ gửi hành vi (test)
-              </NavItem>
-              <NavItem to="/quan-tri/cong-cu-offline" onNavigate={handleNav}>
-                Công cụ ghi offline (test)
+              <NavItem to="/quan-tri/thong-bao" onNavigate={handleNav}>
+                Quản lý thông báo
               </NavItem>
             </div>
           </div>
